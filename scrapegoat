@@ -1,0 +1,41 @@
+# installs Joe Clinton's image downloading packages
+pip install git+https://github.com/Joeclinton1/google-images-download.git
+
+import os
+import numpy as np
+from google.colab import drive
+from google_images_download import google_images_download
+drive.mount('/content/drive/')
+
+#instantiate the class
+response = google_images_download.googleimagesdownload();
+arguments = {"keywords":"baseball sport,cricket sport","limit":100,"print_urls":True,"format":"jpg"}
+paths = response.download(arguments)
+
+#print complete paths to the downloaded images
+print(paths)
+
+#renames the images' pathways to be an indexed .jpg within the downloads folder
+data = "/content/downloads/"
+folders = np.array(os.listdir(data))
+for folder in folders:
+  curfol = data + folder;
+  pictures = np.array(os.listdir(curfol));
+  i = 0
+  for picture in pictures:
+    old = curfol + "/" + picture
+    new = curfol + "_" + str(i) + ".jpg";
+    os.rename(old, new) 
+    i = i + 1;
+
+#removes the now empty folders, each named a category
+categories = ['baseball sport','cricket sport'];
+for category in categories:
+  path = data + category;
+  if os.path.exists(path):
+    os.rmdir(path)
+
+#zips the downloads file and downloads it onto the user's local machine
+!zip -r /content/file.zip //content/downloads/
+from google.colab import files
+files.download("/content/file.zip")
